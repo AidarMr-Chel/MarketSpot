@@ -1,0 +1,161 @@
+﻿ @model MarketSpot.Application.DTOs.PaymentRequest
+ @{
+    ViewData["Title"] = "Cart";
+
+}
+
+<div role="main">
+    <div class="wrapper">
+
+        <div class="border border-bottom mb-5">
+            <div class="breadcrumb-wrap">
+                <div class="container py-3">
+                    <div class="row d-flex justify-content-md-between justify-content-sm-center">
+                        <div class="col-md-4">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item mr-1 font-weight-bold"><a href="#">Home</a></li>
+                                    <li class="breadcrumb-item ml-1 font-weight-bold active" aria-current="page">
+                                        Library
+                                    </li>
+                                </ol>
+                            </nav>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container">
+            <div class="row">
+               
+                <div class="col-md-8 order-md-1">
+                    <h4 class="mb-3">Billing address</h4>
+                    <div class="card mb-5">
+
+                        <div class="card-body">
+                            <form id="paymentForm" role="form" class="form-width">
+                                <input type="hidden" id="productId" value="@ViewData["ProductId"]" />
+
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="cardHolderName" name="cardHolderName" placeholder="Card Holder's Name" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="number" class="form-control" id="cardNumber" name="cardNumber" placeholder="Valid Card Number" required />
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 form-group pr-md-0">
+                                        <select id="expMonth" class="form-control" required>
+                                            <option value="">Month</option>
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+                                            <option>11</option>
+                                            <option>12</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 form-group pr-md-0">
+                                        <select id="expYear" class="form-control" required>
+                                            <option value="">Year</option>
+                                            <option>2018</option>
+                                            <option>2019</option>
+                                            <option>2020</option>
+                                            <option>2021</option>
+                                            <option>2022</option>
+                                            <option>2023</option>
+                                            <option>2024</option>
+                                            <option>2025</option>
+                                            <option>2026</option>
+                                            <option>2027</option>
+                                            <option>2028</option>
+                                            <option>2029</option>
+                                            <option>2030</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <input type="number" class="form-control" id="cvc" name="cvc" placeholder="CVC" required />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Full Name on Card" required />
+                                </div>
+
+                                <input type="hidden" id="productId" value="@ViewData["ProductId"]" />
+
+
+                                <div class="form-group">
+                                    <button class="btn btn-primary col-md-4" type="submit">Checkout</button>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    document.getElementById("paymentForm").addEventListener("submit", async function (e) {
+      e.preventDefault(); // ❗️важно: остановить обычную отправку
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("productId");
+
+      if (!productId) {
+        alert("ProductId не найден в URL");
+        return;
+      }
+          const data = {
+      productId: document.getElementById("productId").value,
+      cardHolderName: document.getElementById("cardHolderName").value,
+      cardNumber: document.getElementById("cardNumber").value,
+      expMonth: parseInt(document.getElementById("expMonth").value),
+      expYear: parseInt(document.getElementById("expYear").value),
+      cvc: document.getElementById("cvc").value,
+      fullName: document.getElementById("fullName").value
+    };
+
+
+
+      try {
+        const response = await fetch("/api/Payment/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          alert("Платёж успешен!");
+          window.location.href = "/Account/Downloads";
+        } else {
+          const result = await response.json();
+              console.log("Result:", result);
+    console.log("Status:", response.status);
+
+          alert("Ошибка оплаты: " + (result?.message || response.statusText));
+        }
+      } catch (error) {
+        alert("Сетевая ошибка: " + error.message);
+      }
+    });
+</script>
+
+
+

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<MarketSpot.Application.DTOs.ProductDto>
+
+<h2>Продукты пользователя</h2>
+
+<a asp-action="Users" class="btn btn-secondary mb-3">Назад к списку пользователей</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Title</td>
+                <td>@product.Price</td>
+                <td>
+                    <form method="post" asp-action="DeleteUserProduct" asp-route-productId="@product.Id" onsubmit="return confirm('Удалить продукт?');" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

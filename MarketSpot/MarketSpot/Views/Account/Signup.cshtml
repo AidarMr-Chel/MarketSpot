@@ -1,0 +1,107 @@
+﻿@model MarketSpot.Views.Account.SignupModel
+@{
+    ViewData["Title"] = "Signup";
+}
+<div>
+
+    <main role="main">
+
+        <div class="account-pages mt-7 mb-5">
+            <div class="container">
+                <div class="row d-flex justify-content-center align-items-center">
+                    <div class="col-md-8 col-lg-6 col-xl-5">
+                        <div class="card hover-box-shadow">
+                            <div class="card-body px-auto">
+                                <h4 class="card-title mt-3 text-center">Create Account</h4>
+
+                                <!-- end:Social logins-->
+                                <hr class="divider divider-fade">
+                                <form id="registerForm">
+                                    <div class="form-group input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="las la-envelope"></i></span>
+                                        </div>
+                                        <input id="registerEmail" class="form-control" placeholder="Email address" type="email" required>
+                                    </div>
+
+                                    <div class="form-group input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="las la-key"></i></span>
+                                        </div>
+                                        <input id="registerPassword" class="form-control" placeholder="Create password" type="password" required>
+                                    </div>
+
+                                    <div class="form-group input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="las la-key"></i></span>
+                                        </div>
+                                        <input id="repeatPassword" class="form-control" placeholder="Repeat password" type="password" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                                    </div>
+
+                                    <p class="text-center">
+                                        Have an account?
+                                        <a href="/Account/Login">Log In</a>
+                                    </p>
+                                </form>
+
+                            </div>
+                        </div>
+                        <!-- end card -->
+                    </div> <!-- end col -->
+                </div>
+                <!-- end row -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end page -->
+
+
+
+
+    </main>
+
+
+
+    <!-- endbuild -->
+
+</div>
+<script>
+        const apiBase = "https://localhost:7251/api/Auth";
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+      const repeatPassword = document.getElementById("repeatPassword").value;
+
+      if (password !== repeatPassword) {
+        alert("Пароли не совпадают!");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiBase}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include', 
+          body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+          alert("Регистрация успешна! Теперь войдите.");
+          window.location.href = "/Account/Login";
+        } else {
+          const data = await response.json();
+          alert("Ошибка регистрации: " + JSON.stringify(data));
+        }
+      } catch (error) {
+        alert("Ошибка соединения с сервером");
+        console.error(error);
+      }
+    });
+</script>

@@ -1,0 +1,153 @@
+﻿@model MarketSpot.Core.Entities.Product
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div role="main">
+    <div class="wrapper">
+        <div class="breadcrumb-wrap">
+            <div class="container py-3">
+                <div class="row d-flex justify-content-md-between justify-content-sm-center">
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item mr-1 font-weight-bold"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item ml-1 font-weight-bold active" aria-current="page">
+                                    @Model.Category
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-7 col-lg-9">
+                        <div class="product-info">
+                            <!-- Item Img Slider -->
+                            <div class="swiper-container rounded border">
+                                <div class="swiper-wrapper">
+                                    <div class="swiper-slide">
+                                        <img src="@Model.ImageFilePath" alt="@Model.Title">
+                                    </div>
+                                </div>
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        </div>
+                        <div class="demo-bar card rounded mt-3 card px-3 text-sm-center">
+                            <div class="row d-flex justify-content-between justify-content-md-center align-items-center my-3">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+                                    <a href="#" class="btn btn-success-alt btn-block">Live Preview<i class="las la-desktop ml-2"></i></a>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-4">
+                                    <p class="m-0 text-lg-right text-md-right text-md-center">Spread the word and earn!</p>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-4">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Send link to someone" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success-alt text-success" type="button">Send <i class="las la-envelope"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-description-text pr-lg-2">
+                            <h1 class="mt-4 mb-4">
+                                @Model.Title
+                            </h1>
+                            <p class="lead">
+                                @Model.Subtitle
+                            </p>
+                            <p>
+                                @Model.FullDescription
+                            </p>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="sidebar-widget bg-light-soft">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <span class="sidebar-widget-title--sm">Features</span>
+                                                <ul class="list-unstyled mb-0">
+                                                    <li><i class="las la-check mr-2 text-success"></i>High quality</li>
+                                                    <li><i class="las la-check mr-2 text-success"></i>Ready to use</li>
+                                                    <li><i class="las la-check mr-2 text-success"></i>Easy to customize</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="col-md-5 col-lg-3">
+                        <div class="sidebar sticky-lg-top sticky-md-top">
+                            <div class="sidebar-widget">
+                                <h3 class="mb-4">@Model.Title</h3>
+                                <div class="row d-flex justify-content-between align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <select id="inputState" class="form-control">
+                                                <option selected>Regular license</option>
+                                                <option>Extended license</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group text-md-right text-sm-center">
+                                            @if (Model.DiscountPrice.HasValue)
+                                            {
+                                                <h2 class="item-widget-price"><s class="text-muted">$@Model.Price</s> $@Model.DiscountPrice</h2>
+                                            }
+                                            else
+                                            {
+                                                <h2 class="item-widget-price">$@Model.Price</h2>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <form method="get" asp-controller="Market" asp-action="Cart">
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <button class="btn btn-primary btn-block" type="submit">
+                                        Purchase → <span class="price">$@(Model.DiscountPrice ?? Model.Price)</span>
+                                    </button>
+                                </form>
+
+
+                            </div>
+
+                            <div class="sidebar-widget">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <hr />
+                                        <span class="sidebar-widget-title--sm">Short Description</span>
+                                        <p>@Model.ShortDescription</p>
+                                        <hr />
+                                        <span class="sidebar-widget-title--sm">File Info</span>
+                                        <div class="col-12 p-0">
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <span class="small">Author</span>
+                                                <strong class="small text-dark">@Model.AuthorId</strong>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <span class="small">Category</span>
+                                                <strong class="small text-dark">@Model.Category</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

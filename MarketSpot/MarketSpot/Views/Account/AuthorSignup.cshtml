@@ -1,0 +1,128 @@
+﻿@* @model MarketSpot.Views.Account.AuthorSignupModel
+ *@@{
+    ViewData["Title"] = "AuthorSignup";
+
+}
+
+<div role="main">
+
+    <div class="account-pages mt-5 mb-5">
+        <div class="container">
+            <div class="row d-flex justify-content-center align-items-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="card hover-box-shadow">
+                        <div class="card-body px-auto">
+                            <h4 class="card-title mt-3 text-center">Create Account</h4>
+
+                            <!-- end:Social logins-->
+
+                            <hr class="divider divider-fade" />
+
+                            <form id="authorRegisterForm" action="#" class="pb-3">
+                                <div class="form-group">
+                                    <label for="shopname">Create Username / Store Name</label>
+                                    <input class="form-control" type="text" id="shopname" placeholder="shop name" required />
+                                    <p class="text-small text-muted mt-1">
+                                        Your username will be your store name and cannot be changed later.
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="emailaddress">Email address</label>
+                                    <input class="form-control" type="email" id="emailaddress" required placeholder="Enter your email" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input class="form-control" type="password" id="password" required placeholder="Enter your password" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="links">Portfolio</label>
+                                    <input class="form-control" type="text" id="links" required placeholder="Portfolio link" />
+                                </div>
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="checkbox-signup" />
+                                        <label class="custom-control-label" for="checkbox-signup">
+                                            I accept
+                                            <a href="javascript: void(0);" class="text-dark">Terms and Conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-0 text-center">
+                                    <button class="btn btn-primary btn-block" type="submit">Sign Up</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- end card -->
+
+                    <div class="row mt-3">
+                        <div class="col-12 text-center">
+                            <p class="text-muted">
+                                Already have account?
+                                <a href="/Account/Login" class="text-muted font-weight-medium ml-1">Sign In</a>
+                            </p>
+                        </div>
+                        <!-- end col -->
+                    </div>
+                    <!-- end row -->
+                </div>
+                <!-- end col -->
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+    <!-- end page -->
+
+</div>
+<script>
+            const apiBase = "https://localhost:7251/api/Auth";
+
+    document.getElementById("authorRegisterForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("shopname").value.trim();
+      const email = document.getElementById("emailaddress").value.trim();
+      const password = document.getElementById("password").value;
+      const portfolioUrl = document.getElementById("links").value.trim();
+      const acceptedTerms = document.getElementById("checkbox-signup").checked;
+
+      if (!acceptedTerms) {
+        alert("You must accept the Terms and Conditions.");
+        return;
+      }
+
+      if (!username || !email || !password || !portfolioUrl) {
+        alert("Please fill all required fields.");
+        return;
+      }
+
+      try {
+          const response = await fetch(`${apiBase}/register-author`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include', 
+          body: JSON.stringify({
+            username: username,
+            email: email,
+            password: password,
+            portfolioUrl: portfolioUrl
+          })
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (response.ok) {
+          alert("Регистрация успешна! Теперь войдите.");
+          window.location.href = "/Account/Login";
+        } else {
+          const data = await response.json();
+          alert("Ошибка регистрации: " + JSON.stringify(data));
+        }
+      } catch (error) {
+        alert("Ошибка соединения с сервером");
+        console.error(error);
+      }
+    });
+</script>
+

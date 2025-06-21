@@ -1,0 +1,259 @@
+﻿@model MarketSpot.Application.DTOs.ProductDto
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<div role="main">
+    <div class="wrapper">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-wrap">
+            <div class="container py-3">
+                <div class="row d-flex justify-content-md-between justify-content-sm-center">
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item mr-1 font-weight-bold"><a href="/">Home</a></li>
+                                <li class="breadcrumb-item ml-1 font-weight-bold active" aria-current="page">Search</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+
+                <!-- Sidebar Filters -->
+                <div class="col-md-5 col-lg-3">
+                    <form id="searchForm" method="get" class="sidebar-widget">
+                        <div class="row">
+                            <div class="col-12">
+                                <span class="sidebar-widget-title--sm">Keyword</span>
+                                <div class="input-group mb-4">
+                                    <input type="text" name="title" id="titleInput" placeholder="Search ..." class="form-control">
+                                    <span class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="las la-search"></i></button>
+                                    </span>
+                                </div>
+
+                                <hr>
+                                <span class="sidebar-widget-title--sm">Category</span>
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input" id="catHtml" name="category" value="HTML">
+                                    <label class="custom-control-label w-100" for="catHtml">HTML</label>
+                                </div>
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input" id="catWP" name="category" value="WordPress">
+                                    <label class="custom-control-label w-100" for="catWP">WordPress</label>
+                                </div>
+
+                                <hr>
+                                <span class="sidebar-widget-title--sm">Price range</span>
+                                <div class="price-range d-flex justify-content-between align-items-center">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">$</div>
+                                        </div>
+                                        <input type="text" name="minPrice" id="minPriceInput" class="form-control" placeholder="Min">
+                                    </div>
+                                    <div class="mx-1">
+                                        <p class="mt-3"> - </p>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">$</div>
+                                        </div>
+                                        <input type="text" name="maxPrice" id="maxPriceInput" class="form-control" placeholder="Max">
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-right">
+                                    <button class="btn btn-sm btn-primary px-4" type="submit">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Product Results -->
+                <div class="col-md-7 col-lg-9">
+                    <p id="resultsCount">Всего найдено: 0</p>
+                    <div class="row" id="productsContainer">
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Pagination" id="paginationNav" style="display:none;">
+                        <ul class="pagination pagination-sm" id="paginationUl">
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function () {
+            const $productsContainer = $('#productsContainer');
+            const $resultsCount = $('#resultsCount');
+            const $paginationNav = $('#paginationNav');
+            const $paginationUl = $('#paginationUl');
+            const pageSize = 9;
+            let currentPage = 1;
+
+            function getQueryParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const obj = {};
+                urlParams.forEach((value, key) => {
+                    if (obj[key]) {
+                        if (Array.isArray(obj[key])) {
+                            obj[key].push(value);
+                        } else {
+                            obj[key] = [obj[key], value];
+                        }
+                    } else {
+                        obj[key] = value;
+                    }
+                });
+                return obj;
+            }
+
+            function setFormFromQuery(params) {
+                $('#titleInput').val(params.title || '');
+
+                $('input[name="category"]').each(function () {
+                    $(this).prop('checked', false);
+                });
+                if (params.category) {
+                    const categories = Array.isArray(params.category) ? params.category : [params.category];
+                    categories.forEach(cat => {
+                        $(`input[name="category"][value="${cat}"]`).prop('checked', true);
+                    });
+                }
+
+                $('#minPriceInput').val(params.minPrice || '');
+                $('#maxPriceInput').val(params.maxPrice || '');
+            }
+
+            function buildQueryString(dataArray) {
+                return dataArray.map(p => `${encodeURIComponent(p.name)}=${encodeURIComponent(p.value)}`).join('&');
+            }
+
+            function loadProducts(page = 1, pushToHistory = true) {
+                currentPage = page;
+                let data = $('#searchForm').serializeArray();
+                data.push({ name: 'page', value: currentPage });
+                data.push({ name: 'pageSize', value: pageSize });
+
+                const queryString = buildQueryString(data);
+                if (pushToHistory) {
+                    const newUrl = `${window.location.pathname}?${queryString}`;
+                    window.history.pushState(null, '', newUrl);
+                }
+
+                $.ajax({
+                    url: '@Url.Action("SearchJson", "Market")',
+                    method: 'GET',
+                    data: data,
+                    success: function (result) {
+                        $productsContainer.empty();
+
+                        if (result.items.length === 0) {
+                            $productsContainer.html('<p>Ничего не найдено.</p>');
+                            $resultsCount.text('Всего найдено: 0');
+                            $paginationNav.hide();
+                            return;
+                        }
+
+                        $resultsCount.text('Всего найдено: ' + result.totalCount);
+
+                        result.items.forEach(product => {
+                            const productHtml = `
+                                <div class="col-md-4 mb-4"> 
+                                    <div class="card item-card h-100 border-0">
+                                        <div class="item-card__image rounded">
+                                            <a href="/product/${product.id}">
+                                                <img src="${product.imageFilePath}" class="img-fluid rounded" alt="${product.title}">
+                                            </a>
+                                        </div>
+                                        <div class="card-body px-0 pt-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="item-title">
+                                                    <a href="/Market/Product/${product.id}"> 
+                                                        <h3 class="h6 mb-0 text-truncate">${product.title}</h3>
+                                                    </a>
+                                                </div>
+                                                <div class="item-price">
+                                                    <span>$${product.price}</span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-start align-items-center item-meta">
+                                                <div class="short-description mb-0">
+                                                    <p class="mb-0 extension-text">
+                                                        <a href="#">${product.category}</a>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            $productsContainer.append(productHtml);
+                        });
+
+                        if (result.totalPages > 1) {
+                            $paginationUl.empty();
+                            for (let i = 1; i <= result.totalPages; i++) {
+                                const activeClass = i === currentPage ? 'active' : '';
+                                $paginationUl.append(`
+                                    <li class="page-item ${activeClass}">
+                                        <a href="#" class="page-link" data-page="${i}">${i}</a>
+                                    </li>
+                                `);
+                            }
+                            $paginationNav.show();
+                        } else {
+                            $paginationNav.hide();
+                        }
+                    },
+                    error: function () {
+                        $productsContainer.html('<p>Ошибка при загрузке данных.</p>');
+                        $resultsCount.text('');
+                        $paginationNav.hide();
+                    }
+                });
+            }
+
+            const initialParams = getQueryParams();
+            setFormFromQuery(initialParams);
+            const initialPage = parseInt(initialParams.page) || 1;
+            loadProducts(initialPage, false);
+
+            $('#searchForm').submit(function (e) {
+                e.preventDefault();
+                loadProducts(1);
+            });
+
+            $(document).on('click', '#paginationUl a.page-link', function (e) {
+                e.preventDefault();
+                const page = parseInt($(this).data('page'));
+                if (page && page !== currentPage) {
+                    loadProducts(page);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
+            window.onpopstate = function () {
+                const params = getQueryParams();
+                setFormFromQuery(params);
+                const page = parseInt(params.page) || 1;
+                loadProducts(page, false);
+            };
+        });
+    </script>
+}

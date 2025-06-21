@@ -1,0 +1,197 @@
+﻿@model MarketSpot.Views.Account.AddItemModel
+
+@{
+    ViewData["Title"] = "AddItem";
+}
+
+<div role="main">
+    <div class="wrapper">
+
+        <div class="breadcrumb-wrap">
+            <div class="container py-3">
+                <div class="row d-flex justify-content-md-between justify-content-sm-center">
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item mr-1 font-weight-bold"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item ml-1 font-weight-bold active" aria-current="page">
+                                    Library
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+
+                <partial name="_Dash" />
+
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card mb-5">
+                                <div class="card-header border-bottom">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Add New Item</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <form id="addProductForm" enctype="multipart/form-data">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="title">Title</label>
+                                                            <input type="text" class="form-control" id="title" name="Title" required />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="subtitle">Subtitle</label>
+                                                            <input type="text" class="form-control" id="subtitle" name="Subtitle" required />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="category">Category</label>
+                                                    <select multiple class="form-control height-300" id="category" name="Category" required>
+                                                        <option value="Option 1">— Web Template</option>
+                                                        <option value="Option 2">— Creative</option>
+                                                        <option value="Option 3">— Minimal</option>
+                                                        <option value="Option 4">— Business</option>
+                                                        <option value="Option 5">— Portfolio</option>
+                                                        <option value="Option 6">— Graphic</option>
+                                                        <option value="Option 7">— Illustration</option>
+                                                        <option value="Option 8">— Icons</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="shortDescription">Short Description</label>
+                                                    <textarea class="form-control" rows="3" id="shortDescription" name="ShortDescription" required></textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="fullDescription">Full Description</label>
+                                                    <textarea class="form-control" rows="3" id="fullDescription" name="FullDescription" required></textarea>
+                                                </div>
+                                                <br />
+
+                                                <h4 class="text-black mb-3">Pricing</h4>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="totalPrice">Total Price</label>
+                                                            <input type="text" class="form-control" id="totalPrice" name="TotalPrice" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="discountPrice">Discount Price</label>
+                                                            <input type="text" class="form-control" id="discountPrice" name="DiscountPrice" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br />
+
+                                                <h4 class="mt-4 mb-3">Upload item file</h4>
+                                                <div class="input-group mb-3">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="productFile" name="ProductFile" required />
+                                                        <label class="custom-file-label" for="productFile" id="productFileLabel">Choose file</label>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-actions my-4">
+                                                    <button type="submit" class="btn btn-primary width-150">Save Product</button>
+                                                    <button type="reset" class="btn btn-danger">Cancel</button>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <h4 class="text-black mb-3">Product Image</h4>
+                                                <div class="add-item position-relative mb-3">
+                                                    <div class="add-item-img d-flex justify-content-center border border-radius py-6">
+                                                        <a href="javascript:void(0);">
+                                                            <i class="las la-file"></i>
+                                                        </a>
+                                                    </div>
+                                                    <a href="javascript:void(0);" class="add-item-remove-img add-item-img-remove position-absolute">
+                                                        <small><i class="las la-times"></i></small>
+                                                        Remove
+                                                    </a>
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="file" class="form-control-file" id="imageFile" name="ImageFile" required />
+                                                    <br />
+                                                    <small>Technical information for user</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("productFile").addEventListener("change", function () {
+          const label = document.getElementById("productFileLabel");
+          const fileName = this.files.length > 0 ? this.files[0].name : "Choose file";
+          label.textContent = fileName;
+        });
+    </script>
+
+    <script>
+        document.getElementById("addProductForm").addEventListener("submit", async function(e) {
+          e.preventDefault();
+
+          const form = e.target;
+          const formData = new FormData(form);
+
+          // Проверяем обязательные поля и файлы
+          if (!formData.get("Title") || !formData.get("Category") || !formData.get("Subtitle") ||
+              !formData.get("FullDescription") || !formData.get("ShortDescription") ||
+              !formData.get("ImageFile") || !formData.get("ProductFile")) {
+            alert("Please fill all required fields and upload files.");
+            return;
+          }
+
+          try {
+            const response = await fetch("https://localhost:7251/product/add", {
+              method: "POST",
+              credentials: 'include',  
+              body: formData
+            });
+
+            const text = await response.text();
+            console.log("RAW RESPONSE:", text);
+
+            if (response.ok) {
+              alert("Product added successfully!");
+              form.reset();
+            } else {
+              alert("Error adding product: " + text);
+            }
+          } catch (error) {
+            alert("Request failed: " + error.message);
+            console.error(error);
+          }
+        });
+
+    </script>
+}
+
